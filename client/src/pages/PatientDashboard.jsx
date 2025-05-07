@@ -30,7 +30,6 @@ const PatientDashboard = () => {
 
         if (appointmentsResponse.ok) {
           const appointmentsData = await appointmentsResponse.json();
-          console.log("API Response Data:", appointmentsData.data); // Log the API response
           setAppointments(appointmentsData.data);
         } else {
           console.error("Failed to fetch appointments");
@@ -212,14 +211,14 @@ const PatientDashboard = () => {
                   </div>
                 ))}
               </div>
-            ) : appointments.filter((apt) => apt.status === "Scheduled")
+            ) : appointments.filter((apt) => apt.status === "Approved")
                 .length > 0 ? (
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 {appointments
-                  .filter((apt) => apt.status === "Scheduled")
+                  .filter((apt) => apt.status === "Approved")
                   .map((appointment) => (
                     <AppointmentCard
-                      key={appointment.id}
+                      key={appointment._id}
                       appointment={appointment}
                     />
                   ))}

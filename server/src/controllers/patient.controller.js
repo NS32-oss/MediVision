@@ -75,8 +75,12 @@ export const getPatientAppointments = asyncHandler(async (req, res) => {
   const { patientId } = req.params;
 
   console.log("Fetching appointments for patient:", patientId);
-
-  const appointments = await Appointment.find({ patient: patientId }).populate(
+  const user = await User.findById(patientId);
+  if (!user) {
+    console.log("User not found:", patientId);
+    return res.status(404).json(new apiResponse(404, "User not found"));
+  }
+  const appointments = await Appointment.find({ patient: user.name }).populate(
     "doctor"
   );
 
