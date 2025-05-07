@@ -58,8 +58,8 @@ export const bookAppointment = asyncHandler(async (req, res) => {
 
   // Create the appointment
   const appointment = await Appointment.create({
-    doctor: doctorId,
-    patient: patientId, // Use the userId as the patientId
+    doctor: doctor.name,
+    patient: user.name, // Use the userId as the patientId
     appointmentType,
     dateTime: appointmentDateTime, // Use the converted Date object
     status: "Pending", // Default status

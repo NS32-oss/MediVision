@@ -94,7 +94,7 @@ const DoctorDashboard = () => {
       patient.id.toLowerCase().includes(searchTerm.toLowerCase()) ||
       patient.condition.toLowerCase().includes(searchTerm.toLowerCase())
   );
-
+  console.log("Pending Approvals:", pendingApprovals);
   return (
     <div className="min-h-screen flex flex-col bg-[#F8FAFC]">
       <Navbar />
@@ -356,9 +356,9 @@ const DoctorDashboard = () => {
                   </thead>
                   <tbody className="bg-white divide-y divide-gray-200">
                     {pendingApprovals.map((appointment) => (
-                      <tr key={appointment.id}>
+                      <tr key={appointment._id}>
                         <td className="px-6 py-4 whitespace-nowrap text-sm text-[#374151]">
-                          {appointment.id}
+                          {appointment._id}
                         </td>
                         <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-[#374151]">
                           {appointment.patientName}
