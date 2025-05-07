@@ -40,8 +40,8 @@ const AppointmentCard = ({ appointment }) => {
       <div className="p-4">
         <div className="flex items-start justify-between">
           <div>
-            <h3 className="text-lg font-medium text-[#374151]">{appointment.type}</h3>
-            <p className="text-sm text-gray-500">ID: {appointment.id}</p>
+            <h3 className="text-lg font-medium text-[#374151]">{appointment.appointmentType}</h3>
+            <p className="text-sm text-gray-500">ID: {appointment._id}</p>
           </div>
           <div className={`text-xs font-medium px-2.5 py-0.5 rounded-full ${getStatusColor(appointment.status)}`}>
             {appointment.status}
@@ -51,11 +51,11 @@ const AppointmentCard = ({ appointment }) => {
         <div className="mt-4 space-y-2">
           <div className="flex items-center text-sm">
             <span className="text-gray-500 w-24">Patient:</span>
-            <span className="text-[#374151]">{appointment.patientName}</span>
+            <span className="text-[#374151]">{appointment.patient}</span>
           </div>
           <div className="flex items-center text-sm">
             <span className="text-gray-500 w-24">Doctor:</span>
-            <span className="text-[#374151]">Dr. {appointment.doctorName}</span>
+            <span className="text-[#374151]">{appointment.doctor}</span>
           </div>
           <div className="flex items-center text-sm">
             <span className="text-gray-500 w-24">Date:</span>
@@ -69,7 +69,7 @@ const AppointmentCard = ({ appointment }) => {
 
         <div className="mt-4 flex justify-between">
           <Link
-            to={`/appointment/${appointment.id}`}
+            to={`/appointment/${appointment._id}`}
             className="text-[#0EA5E9] hover:text-[#0EA5E9]/80 text-sm font-medium transition-colors"
           >
             View Details

@@ -6,7 +6,7 @@ import apiResponse from "../utils/apiResponse.js";
 import jwt from "jsonwebtoken";
 import bcrypt from "bcryptjs";
 import dotenv from "dotenv";
-
+import { Appointment } from "../models/appointment.model.js";
 dotenv.config();
 
 // Generate JWT Token
@@ -176,4 +176,12 @@ export const deleteAllPatients = asyncHandler(async (req, res) => {
   return res
     .status(200)
     .json(new apiResponse(200, "Patients deleted successfully", patients));
+});
+
+// to show all appoinments raw data
+export const getAllAppointmentsRaw = asyncHandler(async (req, res) => {
+  const appointments = await Appointment.find({});
+  return res
+    .status(200)
+    .json(new apiResponse(200, "Appointments fetched successfully", appointments));
 });

@@ -20,10 +20,10 @@ const DoctorDashboard = () => {
     const fetchDoctorData = async () => {
       if (!currentUser) return; // Prevent API calls if currentUser is undefined
       console.log("Fetching data for user:", currentUser._id);
-  
+
       try {
         setIsLoading(true);
-  
+
         // Fetch appointments
         const appointmentsResponse = await fetch(
           `${API_BASE_URL}/api/v1/doctors/${currentUser._id}/appointments`,
@@ -34,14 +34,14 @@ const DoctorDashboard = () => {
             },
           }
         );
-  
+
         if (appointmentsResponse.ok) {
           const appointmentsData = await appointmentsResponse.json();
           setAppointments(appointmentsData.data);
         } else {
           console.error("Failed to fetch appointments");
         }
-  
+
         // Fetch patients
         const patientsResponse = await fetch(
           `${API_BASE_URL}/api/v1/doctors/${currentUser._id}/patients`,
@@ -52,14 +52,14 @@ const DoctorDashboard = () => {
             },
           }
         );
-  
+
         if (patientsResponse.ok) {
           const patientsData = await patientsResponse.json();
           setPatients(patientsData.data);
         } else {
           console.error("Failed to fetch patients");
         }
-  
+
         // Fetch pending approvals
         const pendingApprovalsResponse = await fetch(
           `${API_BASE_URL}/api/v1/doctors/${currentUser._id}/pending-approvals`,
@@ -70,7 +70,7 @@ const DoctorDashboard = () => {
             },
           }
         );
-  
+
         if (pendingApprovalsResponse.ok) {
           const pendingApprovalsData = await pendingApprovalsResponse.json();
           setPendingApprovals(pendingApprovalsData.data);
@@ -83,9 +83,52 @@ const DoctorDashboard = () => {
         setIsLoading(false);
       }
     };
-  
+
     fetchDoctorData();
   }, [currentUser]); // Ensure this runs only when currentUser changes
+
+  // Function to handle approval or rejection
+  const handleApproval = async (appointmentId, isApproved) => {
+    try {
+      const response = await fetch(
+        `${API_BASE_URL}/api/v1/doctors/${currentUser._id}/appointments/${appointmentId}/approval`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ isApproved }),
+        }
+      );
+
+      if (response.ok) {
+        const updatedAppointment = await response.json();
+
+        // Update the pending approvals list
+        setPendingApprovals((prev) =>
+          prev.filter((appointment) => appointment._id !== appointmentId)
+        );
+
+        // If approved, add to today's schedule
+        if (isApproved) {
+          setAppointments((prev) => [...prev, updatedAppointment.data]);
+        } else {
+          // If rejected, update the status in the pending approvals list
+          setPendingApprovals((prev) =>
+            prev.map((appointment) =>
+              appointment._id === appointmentId
+                ? { ...appointment, status: "Rejected" }
+                : appointment
+            )
+          );
+        }
+      } else {
+        console.error("Failed to update appointment status");
+      }
+    } catch (error) {
+      console.error("Error handling approval:", error);
+    }
+  };
 
   // Filter patients based on search term
   const filteredPatients = patients.filter(
@@ -94,7 +137,8 @@ const DoctorDashboard = () => {
       patient.id.toLowerCase().includes(searchTerm.toLowerCase()) ||
       patient.condition.toLowerCase().includes(searchTerm.toLowerCase())
   );
-  console.log("Pending Approvals:", pendingApprovals);
+
+  console.log("Appointments:", appointments);
   return (
     <div className="min-h-screen flex flex-col bg-[#F8FAFC]">
       <Navbar />
@@ -138,11 +182,11 @@ const DoctorDashboard = () => {
                   </div>
                 ))}
               </div>
-            ) : appointments.length > 0 && appointments.status== "Approved"? (
+            ) : appointments.length > 0 ? (
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 {appointments.map((appointment) => (
                   <AppointmentCard
-                    key={appointment.id}
+                    key={appointment._id}
                     appointment={appointment}
                   />
                 ))}
@@ -251,9 +295,9 @@ const DoctorDashboard = () => {
                   </thead>
                   <tbody className="bg-white divide-y divide-gray-200">
                     {filteredPatients.map((patient) => (
-                      <tr key={patient.id}>
+                      <tr key={patient._id}>
                         <td className="px-6 py-4 whitespace-nowrap text-sm text-[#374151]">
-                          {patient.id}
+                          {patient._id}
                         </td>
                         <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-[#374151]">
                           {patient.name}
@@ -265,7 +309,7 @@ const DoctorDashboard = () => {
                           {patient.condition}
                         </td>
                         <td className="px-6 py-4 whitespace-nowrap text-sm text-[#374151]">
-                          {patient.lastVisit}
+                          {patient.lastVisit||"April 29, 2025"}
                         </td>
                         <td className="px-6 py-4 whitespace-nowrap text-sm">
                           <div className="flex space-x-2">
@@ -276,7 +320,7 @@ const DoctorDashboard = () => {
                               View
                             </Link>
                             <Link
-                              to={`/appointment/new?patientId=${patient.id}`}
+                              to={`/appointment/new?patientId=${patient._id}`}
                               className="text-[#22C55E] hover:text-[#22C55E]/80 font-medium"
                             >
                               Schedule
@@ -361,7 +405,7 @@ const DoctorDashboard = () => {
                           {appointment._id}
                         </td>
                         <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-[#374151]">
-                          {appointment.patientName}
+                          {appointment.patient}
                         </td>
                         <td className="px-6 py-4 whitespace-nowrap text-sm text-[#374151]">
                           {appointment.appointmentType}
@@ -370,24 +414,30 @@ const DoctorDashboard = () => {
                           {new Date(appointment.dateTime).toLocaleString()}
                         </td>
                         <td className="px-6 py-4 whitespace-nowrap text-sm">
-                          <div className="flex space-x-2">
-                            <button
-                              onClick={() =>
-                                handleApproval(appointment.id, true)
-                              }
-                              className="text-[#22C55E] hover:text-[#22C55E]/80 font-medium"
-                            >
-                              Accept
-                            </button>
-                            <button
-                              onClick={() =>
-                                handleApproval(appointment.id, false)
-                              }
-                              className="text-red-600 hover:text-red-700 font-medium"
-                            >
-                              Reject
-                            </button>
-                          </div>
+                          {appointment.status === "Rejected" ? (
+                            <span className="text-red-600 font-medium">
+                              Rejected
+                            </span>
+                          ) : (
+                            <div className="flex space-x-2">
+                              <button
+                                onClick={() =>
+                                  handleApproval(appointment._id, true)
+                                }
+                                className="text-[#22C55E] hover:text-[#22C55E]/80 font-medium"
+                              >
+                                Accept
+                              </button>
+                              <button
+                                onClick={() =>
+                                  handleApproval(appointment._id, false)
+                                }
+                                className="text-red-600 hover:text-red-700 font-medium"
+                              >
+                                Reject
+                              </button>
+                            </div>
+                          )}
                         </td>
                       </tr>
                     ))}

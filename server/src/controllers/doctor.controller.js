@@ -23,7 +23,7 @@ export const getDoctorAppointments = asyncHandler(async (req, res) => {
   }
 
   // Fetch appointments for the doctor
-  const appointments = await Appointment.find({ doctor: doctor._id }).populate(
+  const appointments = await Appointment.find({ doctor: doctor.name }).populate(
     "patient"
   );
 
@@ -76,7 +76,7 @@ export const getPendingApprovals = asyncHandler(async (req, res) => {
 
   // Fetch pending approvals for the doctor
   const pendingApprovals = await Appointment.find({
-    doctor: doctor._id,
+    doctor: doctor.name,
     status: "Pending",
   }).populate("patient");
 
@@ -96,13 +96,39 @@ export const handleAppointmentApproval = asyncHandler(async (req, res) => {
   const { appointmentId } = req.params;
   const { isApproved } = req.body;
 
+  // Find the appointment
   const appointment = await Appointment.findById(appointmentId);
   if (!appointment) {
     return res.status(404).json(new apiResponse(404, "Appointment not found"));
   }
 
+  // Update the appointment status
   appointment.status = isApproved ? "Approved" : "Rejected";
   await appointment.save();
+
+  // If approved, add the patient to the doctor's patients array
+  if (isApproved) {
+    const doctor = await Doctor.findOne({ name: appointment.doctor });
+    if (!doctor) {
+      return res.status(404).json(new apiResponse(404, "Doctor not found"));
+    }
+
+    // Fetch the patient's ObjectId
+    const patient = await Patient.findOne({ name: appointment.patient });
+    if (!patient) {
+      return res.status(404).json(new apiResponse(404, "Patient not found"));
+    }
+
+    // Check if the patient is already in the doctor's patients array
+    const patientExists = doctor.patients.some(
+      (patientId) => patientId.toString() === patient._id.toString()
+    );
+
+    if (!patientExists) {
+      doctor.patients.push(patient._id); // Use the patient's ObjectId
+      await doctor.save();
+    }
+  }
 
   return res
     .status(200)
