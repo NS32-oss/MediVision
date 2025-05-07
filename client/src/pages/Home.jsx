@@ -1,12 +1,12 @@
-import { Link } from "react-router-dom"
-import Navbar from "../components/Navbar"
-import Footer from "../components/Footer"
-import React from "react"
+import { Link } from "react-router-dom";
+import Navbar from "../components/Navbar";
+import Footer from "../components/Footer";
+import React from "react";
 const Home = () => {
   return (
     <div className="min-h-screen flex flex-col bg-[#F8FAFC]">
       <Navbar />
-
+      
       <main className="flex-grow">
         {/* Hero Section */}
         <section className="bg-white">
@@ -17,8 +17,10 @@ const Home = () => {
                   Your Health, Our Priority
                 </h1>
                 <p className="mt-4 text-lg text-gray-600">
-                  MedCareHub provides comprehensive healthcare solutions for patients and medical professionals. Book
-                  appointments, manage medical records, and connect with healthcare providers all in one place.
+                  MedCareHub provides comprehensive healthcare solutions for
+                  patients and medical professionals. Book appointments, manage
+                  medical records, and connect with healthcare providers all in
+                  one place.
                 </p>
                 <div className="mt-8 flex flex-wrap gap-4">
                   <Link
@@ -50,10 +52,12 @@ const Home = () => {
         <section id="features" className="py-16">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div className="text-center mb-12">
-              <h2 className="text-3xl font-bold text-[#374151]">Our Features</h2>
+              <h2 className="text-3xl font-bold text-[#374151]">
+                Our Features
+              </h2>
               <p className="mt-4 text-lg text-gray-600 max-w-3xl mx-auto">
-                MedCareHub offers a range of features designed to streamline healthcare management for patients,
-                doctors, and administrators.
+                MedCareHub offers a range of features designed to streamline
+                healthcare management for patients, doctors, and administrators.
               </p>
             </div>
 
@@ -76,11 +80,17 @@ const Home = () => {
                     ></path>
                   </svg>
                 </div>
-                <h3 className="text-xl font-semibold text-[#374151] mb-2">Patient Portal</h3>
+                <h3 className="text-xl font-semibold text-[#374151] mb-2">
+                  Patient Portal
+                </h3>
                 <p className="text-gray-600 mb-4">
-                  Access your medical records, book appointments, and communicate with your healthcare providers.
+                  Access your medical records, book appointments, and
+                  communicate with your healthcare providers.
                 </p>
-                <Link to="/login" className="text-[#0EA5E9] hover:text-[#0EA5E9]/80 font-medium transition-colors">
+                <Link
+                  to="/login"
+                  className="text-[#0EA5E9] hover:text-[#0EA5E9]/80 font-medium transition-colors"
+                >
                   Login as Patient →
                 </Link>
               </div>
@@ -103,11 +113,17 @@ const Home = () => {
                     ></path>
                   </svg>
                 </div>
-                <h3 className="text-xl font-semibold text-[#374151] mb-2">Doctor Dashboard</h3>
+                <h3 className="text-xl font-semibold text-[#374151] mb-2">
+                  Doctor Dashboard
+                </h3>
                 <p className="text-gray-600 mb-4">
-                  Manage your schedule, access patient records, and update treatment plans efficiently.
+                  Manage your schedule, access patient records, and update
+                  treatment plans efficiently.
                 </p>
-                <Link to="/login" className="text-[#0EA5E9] hover:text-[#0EA5E9]/80 font-medium transition-colors">
+                <Link
+                  to="/login"
+                  className="text-[#0EA5E9] hover:text-[#0EA5E9]/80 font-medium transition-colors"
+                >
                   Login as Doctor →
                 </Link>
               </div>
@@ -136,11 +152,17 @@ const Home = () => {
                     ></path>
                   </svg>
                 </div>
-                <h3 className="text-xl font-semibold text-[#374151] mb-2">Admin Tools</h3>
+                <h3 className="text-xl font-semibold text-[#374151] mb-2">
+                  Admin Tools
+                </h3>
                 <p className="text-gray-600 mb-4">
-                  Oversee facility operations, manage staff, and ensure smooth healthcare delivery.
+                  Oversee facility operations, manage staff, and ensure smooth
+                  healthcare delivery.
                 </p>
-                <Link to="/login" className="text-[#0EA5E9] hover:text-[#0EA5E9]/80 font-medium transition-colors">
+                <Link
+                  to="/login"
+                  className="text-[#0EA5E9] hover:text-[#0EA5E9]/80 font-medium transition-colors"
+                >
                   Login as Admin →
                 </Link>
               </div>
@@ -152,9 +174,12 @@ const Home = () => {
         <section className="bg-[#0EA5E9] py-16">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div className="text-center">
-              <h2 className="text-3xl font-bold text-white">Ready to Get Started?</h2>
+              <h2 className="text-3xl font-bold text-white">
+                Ready to Get Started?
+              </h2>
               <p className="mt-4 text-lg text-white/90 max-w-3xl mx-auto">
-                Join MedCareHub today and experience healthcare management like never before.
+                Join MedCareHub today and experience healthcare management like
+                never before.
               </p>
               <div className="mt-8">
                 <Link
@@ -171,7 +196,7 @@ const Home = () => {
 
       <Footer />
     </div>
-  )
-}
+  );
+};
 
-export default Home
+export default Home;

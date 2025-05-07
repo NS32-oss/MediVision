@@ -27,8 +27,9 @@ app.use(express.static("public"));
 
 // Import and declare routes
 import authRouter from './routes/auth.router.js';
+import doctorRouter from "./routes/doctor.router.js";
 
-// Register routes
+app.use("/api/v1/doctors", doctorRouter);
 app.use("/api/v1/auth", authRouter);
 
 // Health check route

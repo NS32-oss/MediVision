@@ -16,11 +16,17 @@ export const AuthProvider = ({ children }) => {
   useEffect(() => {
     // Check if user is logged in from localStorage
     const user = localStorage.getItem("user");
+    console.log("User from localStorage:", user); // Log the user for debugging
     if (user) {
       setCurrentUser(JSON.parse(user));
     }
     setLoading(false);
   }, []);
+  
+  // Log the updated currentUser
+  useEffect(() => {
+    console.log("Current User in AuthContext:", currentUser);
+  }, [currentUser]);
 
   const login = async (email, password) => {
     try {
