@@ -1,89 +1,74 @@
-"use client"
-import React from "react"
-import { useState, useEffect } from "react"
-import { Link } from "react-router-dom"
-import Navbar from "../components/Navbar"
-import Footer from "../components/Footer"
-import AppointmentCard from "../components/AppointmentCard"
-import { useAuth } from "../context/AuthContext"
+"use client";
+import React, { useState, useEffect } from "react";
+import { Link } from "react-router-dom";
+import Navbar from "../components/Navbar";
+import Footer from "../components/Footer";
+import AppointmentCard from "../components/AppointmentCard";
+import { useAuth } from "../context/AuthContext";
 
 const PatientDashboard = () => {
-  const { currentUser } = useAuth()
-  const [appointments, setAppointments] = useState([])
-  const [medicalRecords, setMedicalRecords] = useState([])
-  const [isLoading, setIsLoading] = useState(true)
+  const { currentUser } = useAuth();
+  const [appointments, setAppointments] = useState([]);
+  const [medicalRecords, setMedicalRecords] = useState([]);
+  const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    // Simulate API call to fetch patient data
     const fetchPatientData = async () => {
       try {
-        // In a real app, these would be actual API calls
-        // const appointmentsResponse = await fetch(`/api/patients/${currentUser.id}/appointments`);
-        // const recordsResponse = await fetch(`/api/patients/${currentUser.id}/records`);
+        setIsLoading(true);
 
-        // Simulate API response
-        setTimeout(() => {
-          setAppointments([
-            {
-              id: "APT-1001",
-              type: "General Checkup",
-              patientName: currentUser?.name || "John Doe",
-              doctorName: "Sarah Johnson",
-              dateTime: "2023-06-15T10:30:00",
-              status: "Scheduled",
+        // Fetch appointments
+        const appointmentsResponse = await fetch(
+          `http://localhost:8000/api/v1/patients/${currentUser._id}/appointments`,
+          {
+            method: "GET",
+            headers: {
+              "Content-Type": "application/json",
             },
-            {
-              id: "APT-1002",
-              type: "Dental Cleaning",
-              patientName: currentUser?.name || "John Doe",
-              doctorName: "Michael Chen",
-              dateTime: "2023-06-22T14:00:00",
-              status: "Scheduled",
-            },
-            {
-              id: "APT-1003",
-              type: "Follow-up",
-              patientName: currentUser?.name || "John Doe",
-              doctorName: "Sarah Johnson",
-              dateTime: "2023-05-10T11:00:00",
-              status: "Completed",
-            },
-          ])
+          }
+        );
 
-          setMedicalRecords([
-            {
-              id: "REC-2001",
-              date: "2023-05-10",
-              type: "Lab Results",
-              doctor: "Dr. Sarah Johnson",
-              summary: "Blood work results - all normal",
-            },
-            {
-              id: "REC-2002",
-              date: "2023-04-15",
-              type: "Prescription",
-              doctor: "Dr. Sarah Johnson",
-              summary: "Amoxicillin 500mg - 3x daily for 7 days",
-            },
-            {
-              id: "REC-2003",
-              date: "2023-03-22",
-              type: "Vaccination",
-              doctor: "Dr. Michael Chen",
-              summary: "Annual flu vaccine administered",
-            },
-          ])
+        if (appointmentsResponse.ok) {
+          const appointmentsData = await appointmentsResponse.json();
+          console.log("API Response Data:", appointmentsData.data); // Log the API response
+          setAppointments(appointmentsData.data);
+        } else {
+          console.error("Failed to fetch appointments");
+        }
 
-          setIsLoading(false)
-        }, 1000)
+        // Fetch medical records
+        const recordsResponse = await fetch(
+          `http://localhost:8000/api/v1/patients/${currentUser._id}/records`,
+          {
+            method: "GET",
+            headers: {
+              "Content-Type": "application/json",
+            },
+          }
+        );
+
+        if (recordsResponse.ok) {
+          const recordsData = await recordsResponse.json();
+          setMedicalRecords(recordsData.data);
+        } else {
+          console.error("Failed to fetch medical records");
+        }
       } catch (error) {
-        console.error("Error fetching patient data:", error)
-        setIsLoading(false)
+        console.error("Error fetching patient data:", error);
+      } finally {
+        setIsLoading(false);
       }
-    }
+    };
 
-    fetchPatientData()
-  }, [currentUser])
+    if (currentUser) {
+      fetchPatientData();
+    }
+  }, [currentUser]);
+
+  // Log the updated appointments state
+  useEffect(() => {
+    console.log("Updated Appointments State:", appointments);
+  }, [appointments]);
 
   return (
     <div className="min-h-screen flex flex-col bg-[#F8FAFC]">
@@ -92,8 +77,12 @@ const PatientDashboard = () => {
       <main className="flex-grow py-8">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="mb-8">
-            <h1 className="text-2xl font-bold text-[#374151]">Welcome, {currentUser?.name || "Patient"}</h1>
-            <p className="text-gray-600">Manage your appointments and medical records</p>
+            <h1 className="text-2xl font-bold text-[#374151]">
+              Welcome, {currentUser?.name || "Patient"}
+            </h1>
+            <p className="text-gray-600">
+              Manage your appointments and medical records
+            </p>
           </div>
 
           {/* Quick Actions */}
@@ -120,8 +109,12 @@ const PatientDashboard = () => {
                   </svg>
                 </div>
                 <div className="ml-4">
-                  <h3 className="text-lg font-medium text-[#374151]">Book Appointment</h3>
-                  <p className="text-sm text-gray-500">Schedule a new appointment</p>
+                  <h3 className="text-lg font-medium text-[#374151]">
+                    Book Appointment
+                  </h3>
+                  <p className="text-sm text-gray-500">
+                    Schedule a new appointment
+                  </p>
                 </div>
               </div>
             </Link>
@@ -148,8 +141,12 @@ const PatientDashboard = () => {
                   </svg>
                 </div>
                 <div className="ml-4">
-                  <h3 className="text-lg font-medium text-[#374151]">Medical Records</h3>
-                  <p className="text-sm text-gray-500">View your complete records</p>
+                  <h3 className="text-lg font-medium text-[#374151]">
+                    Medical Records
+                  </h3>
+                  <p className="text-sm text-gray-500">
+                    View your complete records
+                  </p>
                 </div>
               </div>
             </Link>
@@ -176,8 +173,12 @@ const PatientDashboard = () => {
                   </svg>
                 </div>
                 <div className="ml-4">
-                  <h3 className="text-lg font-medium text-[#374151]">Messages</h3>
-                  <p className="text-sm text-gray-500">Contact your healthcare team</p>
+                  <h3 className="text-lg font-medium text-[#374151]">
+                    Messages
+                  </h3>
+                  <p className="text-sm text-gray-500">
+                    Contact your healthcare team
+                  </p>
                 </div>
               </div>
             </Link>
@@ -186,8 +187,13 @@ const PatientDashboard = () => {
           {/* Upcoming Appointments */}
           <div className="mb-8">
             <div className="flex items-center justify-between mb-4">
-              <h2 className="text-xl font-semibold text-[#374151]">Upcoming Appointments</h2>
-              <Link to="/appointments" className="text-sm text-[#0EA5E9] hover:text-[#0EA5E9]/80 font-medium">
+              <h2 className="text-xl font-semibold text-[#374151]">
+                Upcoming Appointments
+              </h2>
+              <Link
+                to="/appointments"
+                className="text-sm text-[#0EA5E9] hover:text-[#0EA5E9]/80 font-medium"
+              >
                 View All
               </Link>
             </div>
@@ -195,7 +201,10 @@ const PatientDashboard = () => {
             {isLoading ? (
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 {[...Array(2)].map((_, index) => (
-                  <div key={index} className="bg-white p-6 rounded-md shadow-sm border border-gray-200 animate-pulse">
+                  <div
+                    key={index}
+                    className="bg-white p-6 rounded-md shadow-sm border border-gray-200 animate-pulse"
+                  >
                     <div className="h-4 bg-gray-200 rounded w-3/4 mb-4"></div>
                     <div className="h-4 bg-gray-200 rounded w-1/2 mb-4"></div>
                     <div className="h-4 bg-gray-200 rounded w-5/6 mb-4"></div>
@@ -203,12 +212,16 @@ const PatientDashboard = () => {
                   </div>
                 ))}
               </div>
-            ) : appointments.filter((apt) => apt.status === "Scheduled").length > 0 ? (
+            ) : appointments.filter((apt) => apt.status === "Scheduled")
+                .length > 0 ? (
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 {appointments
                   .filter((apt) => apt.status === "Scheduled")
                   .map((appointment) => (
-                    <AppointmentCard key={appointment.id} appointment={appointment} />
+                    <AppointmentCard
+                      key={appointment.id}
+                      appointment={appointment}
+                    />
                   ))}
               </div>
             ) : (
@@ -227,8 +240,13 @@ const PatientDashboard = () => {
           {/* Recent Medical Records */}
           <div>
             <div className="flex items-center justify-between mb-4">
-              <h2 className="text-xl font-semibold text-[#374151]">Recent Medical Records</h2>
-              <Link to="/medical-records" className="text-sm text-[#0EA5E9] hover:text-[#0EA5E9]/80 font-medium">
+              <h2 className="text-xl font-semibold text-[#374151]">
+                Recent Medical Records
+              </h2>
+              <Link
+                to="/medical-records"
+                className="text-sm text-[#0EA5E9] hover:text-[#0EA5E9]/80 font-medium"
+              >
                 View All
               </Link>
             </div>
@@ -284,10 +302,18 @@ const PatientDashboard = () => {
                   <tbody className="bg-white divide-y divide-gray-200">
                     {medicalRecords.map((record) => (
                       <tr key={record.id}>
-                        <td className="px-6 py-4 whitespace-nowrap text-sm text-[#374151]">{record.date}</td>
-                        <td className="px-6 py-4 whitespace-nowrap text-sm text-[#374151]">{record.type}</td>
-                        <td className="px-6 py-4 whitespace-nowrap text-sm text-[#374151]">{record.doctor}</td>
-                        <td className="px-6 py-4 whitespace-nowrap text-sm text-[#374151]">{record.summary}</td>
+                        <td className="px-6 py-4 whitespace-nowrap text-sm text-[#374151]">
+                          {record.date}
+                        </td>
+                        <td className="px-6 py-4 whitespace-nowrap text-sm text-[#374151]">
+                          {record.type}
+                        </td>
+                        <td className="px-6 py-4 whitespace-nowrap text-sm text-[#374151]">
+                          {record.doctor}
+                        </td>
+                        <td className="px-6 py-4 whitespace-nowrap text-sm text-[#374151]">
+                          {record.summary}
+                        </td>
                         <td className="px-6 py-4 whitespace-nowrap text-sm">
                           <Link
                             to={`/medical-record/${record.id}`}
@@ -308,7 +334,7 @@ const PatientDashboard = () => {
 
       <Footer />
     </div>
-  )
-}
+  );
+};
 
-export default PatientDashboard
+export default PatientDashboard;

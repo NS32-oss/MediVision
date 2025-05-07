@@ -1,5 +1,6 @@
 import { Router } from "express";
 import {
+  getAllDoctors,
   getDoctorAppointments,
   getDoctorPatients,
   getPendingApprovals,
@@ -8,6 +9,7 @@ import {
 
 const router = Router();
 
+router.get("/", getAllDoctors); // Add this route to fetch all doctors
 router.get("/:doctorId/appointments", getDoctorAppointments);
 router.get("/:doctorId/patients", getDoctorPatients);
 router.get("/:doctorId/pending-approvals", getPendingApprovals);

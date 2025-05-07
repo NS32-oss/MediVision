@@ -26,7 +26,7 @@ const DoctorDashboard = () => {
   
         // Fetch appointments
         const appointmentsResponse = await fetch(
-          `${API_BASE_URL}/api/doctors/${currentUser._id}/appointments`,
+          `${API_BASE_URL}/api/v1/doctors/${currentUser._id}/appointments`,
           {
             method: "GET",
             headers: {
@@ -44,7 +44,7 @@ const DoctorDashboard = () => {
   
         // Fetch patients
         const patientsResponse = await fetch(
-          `${API_BASE_URL}/api/doctors/${currentUser.id}/patients`,
+          `${API_BASE_URL}/api/v1/doctors/${currentUser._id}/patients`,
           {
             method: "GET",
             headers: {
@@ -62,7 +62,7 @@ const DoctorDashboard = () => {
   
         // Fetch pending approvals
         const pendingApprovalsResponse = await fetch(
-          `${API_BASE_URL}/api/doctors/${currentUser.id}/pending-approvals`,
+          `${API_BASE_URL}/api/v1/doctors/${currentUser._id}/pending-approvals`,
           {
             method: "GET",
             headers: {

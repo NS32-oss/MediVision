@@ -1,3 +1,5 @@
+import { Doctor } from "../models/doctor.model.js";
+import { Patient } from "../models/patient.model.js";
 import User from "../models/user.model.js";
 import asyncHandler from "../utils/asyncHandler.js";
 import apiResponse from "../utils/apiResponse.js";
@@ -17,8 +19,20 @@ const generateToken = (user) => {
 };
 
 // Register User
+
 export const registerUser = asyncHandler(async (req, res) => {
-  const { name, email, password, userType } = req.body;
+  const {
+    name,
+    email,
+    password,
+    userType,
+    specialty,
+    experience,
+    age,
+    gender,
+    phone,
+    condition,
+  } = req.body;
 
   // Check if user already exists
   const existingUser = await User.findOne({ email });
@@ -30,19 +44,60 @@ export const registerUser = asyncHandler(async (req, res) => {
 
   // Create new user
   const user = await User.create({ name, email, password, userType });
+
+  // Create a corresponding Doctor or Patient object
+  if (userType === "doctor") {
+    if (!specialty || !experience) {
+      return res
+        .status(400)
+        .json(
+          new apiResponse(
+            400,
+            "Specialty and experience are required for doctors",
+            null
+          )
+        );
+    }
+
+    await Doctor.create({
+      name: user.name,
+      email: user.email,
+      specialty,
+      experience,
+    });
+  } else if (userType === "patient") {
+    if (!age || !gender || !phone || !condition) {
+      return res
+        .status(400)
+        .json(
+          new apiResponse(
+            400,
+            "Age, gender, phone, and condition are required for patients",
+            null
+          )
+        );
+    }
+
+    await Patient.create({
+      name: user.name,
+      age,
+      gender,
+      phone,
+      condition,
+    });
+  }
+
   const token = generateToken(user);
 
-  return res
-    .status(201)
-    .json(
-      new apiResponse(201, "User registered successfully", {
-        _id: user._id,
-        name: user.name,
-        email: user.email,
-        userType: user.userType,
-        token,
-      })
-    );
+  return res.status(201).json(
+    new apiResponse(201, "User registered successfully", {
+      _id: user._id,
+      name: user.name,
+      email: user.email,
+      userType: user.userType,
+      token,
+    })
+  );
 });
 
 // Login User
@@ -58,15 +113,21 @@ export const loginUser = asyncHandler(async (req, res) => {
 
   const token = generateToken(user);
 
-  return res
-    .status(200)
-    .json(
-      new apiResponse(200, "User logged in successfully", {
-        _id: user._id,
-        name: user.name,
-        email: user.email,
-        userType: user.userType,
-        token,
-      })
-    );
+  return res.status(200).json(
+    new apiResponse(200, "User logged in successfully", {
+      _id: user._id,
+      name: user.name,
+      email: user.email,
+      userType: user.userType,
+      token,
+    })
+  );
+});
+
+//get all users 
+export const getAllUsers = asyncHandler(async (req, res) => {
+  const users = await User.find({}, "-password");
+  return res.status(200).json(
+    new apiResponse(200, "Users fetched successfully", users)
+  );
 });
