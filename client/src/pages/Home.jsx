@@ -37,11 +37,11 @@ const Home = () => {
                   </a>
                 </div>
               </div>
-              <div className="flex justify-center">
+              <div className="flex justify-center w-170">
                 <img
-                  src="/placeholder.svg?height=400&width=500"
+                  src="/image.png"
                   alt="Healthcare professionals"
-                  className="max-w-full h-auto rounded-lg shadow-md"
+                  className="max-w-full h-auto rounded-lg shadow-md w-400"
                 />
               </div>
             </div>
