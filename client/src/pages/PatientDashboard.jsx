@@ -301,7 +301,9 @@ const PatientDashboard = () => {
                   </thead>
                   <tbody className="bg-white divide-y divide-gray-200">
                     {medicalRecords.map((record) => (
-                      <tr key={record.id}>
+                      <tr key={record._id}>
+                  
+                        {/* Use _id or another unique field */}
                         <td className="px-6 py-4 whitespace-nowrap text-sm text-[#374151]">
                           {record.date}
                         </td>
@@ -316,7 +318,7 @@ const PatientDashboard = () => {
                         </td>
                         <td className="px-6 py-4 whitespace-nowrap text-sm">
                           <Link
-                            to={`/medical-record/${record.id}`}
+                            to={`/medical-record/${record._id}`}
                             className="text-[#0EA5E9] hover:text-[#0EA5E9]/80 font-medium"
                           >
                             View

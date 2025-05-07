@@ -20,6 +20,8 @@ const generateToken = (user) => {
 
 // Register User
 
+// src/controllers/auth.controller.js
+
 export const registerUser = asyncHandler(async (req, res) => {
   const {
     name,
@@ -32,7 +34,24 @@ export const registerUser = asyncHandler(async (req, res) => {
     gender,
     phone,
     condition,
+    records,
   } = req.body;
+
+  // Log incoming request for debugging
+  console.log("Incoming registration data:", req.body);
+
+  // Validate common fields
+  if (!name || !email || !password || !userType) {
+    return res
+      .status(400)
+      .json(
+        new apiResponse(
+          400,
+          "Name, email, password, and userType are required",
+          null
+        )
+      );
+  }
 
   // Check if user already exists
   const existingUser = await User.findOne({ email });
@@ -65,6 +84,8 @@ export const registerUser = asyncHandler(async (req, res) => {
       specialty,
       experience,
     });
+
+    console.log(`New doctor created: ${user.name} (${user.email})`);
   } else if (userType === "patient") {
     if (!age || !gender || !phone || !condition) {
       return res
@@ -78,15 +99,32 @@ export const registerUser = asyncHandler(async (req, res) => {
         );
     }
 
-    await Patient.create({
+    // Make sure the records are properly cast to Mongoose subdocuments
+    const patientRecords = records
+      ? records.map((record) => ({
+          date: new Date(record.date),
+          type: record.type,
+          doctor: record.doctor,
+          summary: record.summary,
+        }))
+      : [];
+
+    console.log("Records being saved:", patientRecords);
+
+    const patient = await Patient.create({
       name: user.name,
       age,
       gender,
       phone,
       condition,
+      records: patientRecords,
     });
+
+    console.log("Patient records:", patient.records);
+    console.log(`New patient created: ${user.name} (${user.email})`);
   }
 
+  // Generate JWT Token
   const token = generateToken(user);
 
   return res.status(201).json(
@@ -124,10 +162,18 @@ export const loginUser = asyncHandler(async (req, res) => {
   );
 });
 
-//get all users 
+//get all users
 export const getAllUsers = asyncHandler(async (req, res) => {
   const users = await User.find({}, "-password");
-  return res.status(200).json(
-    new apiResponse(200, "Users fetched successfully", users)
-  );
+  return res
+    .status(200)
+    .json(new apiResponse(200, "Users fetched successfully", users));
+});
+
+//delete all user whose user type is patient
+export const deleteAllPatients = asyncHandler(async (req, res) => {
+  const patients = await User.deleteMany({ userType: "patient" });
+  return res
+    .status(200)
+    .json(new apiResponse(200, "Patients deleted successfully", patients));
 });

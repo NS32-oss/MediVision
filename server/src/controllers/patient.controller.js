@@ -3,7 +3,7 @@ import { Patient } from "../models/patient.model.js";
 import { Doctor } from "../models/doctor.model.js";
 import asyncHandler from "../utils/asyncHandler.js";
 import apiResponse from "../utils/apiResponse.js";
-import  User  from "../models/user.model.js"; // Import the User model
+import User from "../models/user.model.js"; // Import the User model
 
 export const bookAppointment = asyncHandler(async (req, res) => {
   console.log("Booking appointment for user:", req.body);
@@ -14,7 +14,12 @@ export const bookAppointment = asyncHandler(async (req, res) => {
   if (!doctorId || !appointmentType || !dateTime) {
     return res
       .status(400)
-      .json(new apiResponse(400, "Doctor ID, appointment type, and date/time are required"));
+      .json(
+        new apiResponse(
+          400,
+          "Doctor ID, appointment type, and date/time are required"
+        )
+      );
   }
 
   // Check if the user exists and is a patient
@@ -26,7 +31,11 @@ export const bookAppointment = asyncHandler(async (req, res) => {
 
   if (user.userType !== "patient") {
     console.log("User is not a patient:", patientId);
-    return res.status(403).json(new apiResponse(403, "User is not authorized to book an appointment"));
+    return res
+      .status(403)
+      .json(
+        new apiResponse(403, "User is not authorized to book an appointment")
+      );
   }
 
   // Check if the doctor exists
@@ -80,16 +89,35 @@ export const getPatientAppointments = asyncHandler(async (req, res) => {
 
 // Fetch all medical records for a patient
 export const getPatientRecords = asyncHandler(async (req, res) => {
-  const { patientId } = req.params;
+  const { patientId } = req.params; // This is actually the userId
 
-  console.log("Fetching medical records for patient:", patientId);
+  console.log("Fetching medical records for user:", patientId);
 
-  const patient = await Patient.findById(patientId);
-
-  if (!patient) {
-    return res.status(404).json(new apiResponse(404, "Patient not found"));
+  // Check if the user exists and is a patient
+  const user = await User.findById(patientId);
+  if (!user) {
+    console.log("User not found:", patientId);
+    return res.status(404).json(new apiResponse(404, "User not found"));
   }
 
+  if (user.userType !== "patient") {
+    console.log("User is not a patient:", patientId);
+    return res
+      .status(403)
+      .json(
+        new apiResponse(403, "User is not authorized to access medical records")
+      );
+  }
+
+  // Fetch the patient document using the userId
+  const patient = await Patient.findOne({ name: user.name }); // Assuming `user` is a reference in the Patient model
+  if (!patient) {
+    console.log("Patient record not found for user:", patientId);
+    return res
+      .status(404)
+      .json(new apiResponse(404, "Patient record not found"));
+  }
+  console.log("Patient record found:", patient);
   // Assuming medical records are stored in the `records` field of the patient document
   return res
     .status(200)
@@ -102,11 +130,10 @@ export const getPatientRecords = asyncHandler(async (req, res) => {
     );
 });
 
-
 //get all patients
 export const getAllPatients = asyncHandler(async (req, res) => {
   const patients = await Patient.find({});
-  return res.status(200).json(
-    new apiResponse(200, "Patients fetched successfully", patients)
-  );
+  return res
+    .status(200)
+    .json(new apiResponse(200, "Patients fetched successfully", patients));
 });
