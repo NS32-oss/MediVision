@@ -148,3 +148,28 @@ export const getAllDoctors = asyncHandler(async (req, res) => {
     .status(200)
     .json(new apiResponse(200, "Doctors fetched successfully", doctors));
 });
+
+
+// delete appointments for a Doctor using it id
+export const deleteDoctorAppointments = asyncHandler(async (req, res) => {
+  const { doctorId } = req.params; // This is actually the userId
+  console.log("Deleting appointments for doctor (user):", doctorId);
+
+  const doctor = await Doctor.findById(doctorId);
+  if (!doctor) {
+    console.log("User not found:", doctorId);
+    return res.status(404).json(new apiResponse(404, "User not found"));
+  }
+  // Find the doctor using the userId       
+   // Delete appointments for the doctor
+  await Appointment.deleteMany({ doctor: doctor.name });
+
+  return res
+    .status(200)
+    .json(
+      new apiResponse(200, "Appointments deleted successfully")
+    );
+});
+
+
+

@@ -64,7 +64,7 @@ export const registerUser = asyncHandler(async (req, res) => {
   // Create new user
   const user = await User.create({ name, email, password, userType });
 
-  // Create a corresponding Doctor or Patient object
+  // Handle roles
   if (userType === "doctor") {
     if (!specialty || !experience) {
       return res
@@ -122,6 +122,13 @@ export const registerUser = asyncHandler(async (req, res) => {
 
     console.log("Patient records:", patient.records);
     console.log(`New patient created: ${user.name} (${user.email})`);
+  } else if (userType === "admin") {
+    // Admin-specific logic (if any) can be added here
+    console.log(`New admin created: ${user.name} (${user.email})`);
+  } else {
+    return res
+      .status(400)
+      .json(new apiResponse(400, "Invalid userType provided", null));
   }
 
   // Generate JWT Token
