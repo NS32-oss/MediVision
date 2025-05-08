@@ -34,7 +34,7 @@ app.use("/api/v1/doctors", doctorRouter);
 app.use("/api/v1/auth", authRouter);
 
 // Health check route
-app.get("/", (req, res) => res.send("MedCareHub API is running..."));
+app.get("/", (req, res) => res.send("MediVision API is running..."));
 
 // Centralized error handling middleware
 app.use((err, req, res, next) => {

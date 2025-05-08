@@ -17,7 +17,7 @@ const Home = () => {
                   Your Health, Our Priority
                 </h1>
                 <p className="mt-4 text-lg text-gray-600">
-                  MedCareHub provides comprehensive healthcare solutions for
+                  MediVision provides comprehensive healthcare solutions for
                   patients and medical professionals. Book appointments, manage
                   medical records, and connect with healthcare providers all in
                   one place.
@@ -56,7 +56,7 @@ const Home = () => {
                 Our Features
               </h2>
               <p className="mt-4 text-lg text-gray-600 max-w-3xl mx-auto">
-                MedCareHub offers a range of features designed to streamline
+                MediVision offers a range of features designed to streamline
                 healthcare management for patients, doctors, and administrators.
               </p>
             </div>
@@ -178,7 +178,7 @@ const Home = () => {
                 Ready to Get Started?
               </h2>
               <p className="mt-4 text-lg text-white/90 max-w-3xl mx-auto">
-                Join MedCareHub today and experience healthcare management like
+                Join MediVision today and experience healthcare management like
                 never before.
               </p>
               <div className="mt-8">

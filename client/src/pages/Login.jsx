@@ -49,7 +49,7 @@ const Login = () => {
           <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-8">
             <div className="text-center mb-6">
               <h1 className="text-2xl font-bold text-[#374151]">
-                Welcome to MedCareHub
+                Welcome to MediVision
               </h1>
               <p className="mt-2 text-gray-600">Sign in to your account</p>
             </div>

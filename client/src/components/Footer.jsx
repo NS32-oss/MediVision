@@ -6,7 +6,7 @@ const Footer = () => {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
           <div>
-            <h3 className="text-lg font-semibold text-[#374151] mb-4">MedCareHub</h3>
+            <h3 className="text-lg font-semibold text-[#374151] mb-4">MediVision</h3>
             <p className="text-[#374151] mb-4">Providing quality healthcare services to improve your well-being.</p>
             <div className="flex space-x-4">
               <a href="#" className="text-[#0EA5E9] hover:text-[#0EA5E9]/80 transition-colors">
@@ -70,7 +70,7 @@ const Footer = () => {
               <p className="text-[#374151] mb-2">123 Healthcare Avenue</p>
               <p className="text-[#374151] mb-2">Medical District, MD 12345</p>
               <p className="text-[#374151] mb-2">
-                <span className="font-medium">Email:</span> info@medcarehub.com
+                <span className="font-medium">Email:</span> info@MediVision.com
               </p>
               <p className="text-[#374151] mb-2">
                 <span className="font-medium">Phone:</span> (123) 456-7890
@@ -81,7 +81,7 @@ const Footer = () => {
 
         <div className="mt-8 pt-8 border-t border-gray-200">
           <p className="text-center text-[#374151]">
-            &copy; {new Date().getFullYear()} MedCareHub. All rights reserved.
+            &copy; {new Date().getFullYear()} MediVision. All rights reserved.
           </p>
         </div>
       </div>
