@@ -83,6 +83,7 @@ export const registerUser = asyncHandler(async (req, res) => {
       email: user.email,
       specialty,
       experience,
+      status: "Pending", // Set status to Pending
     });
 
     console.log(`New doctor created: ${user.name} (${user.email})`);
@@ -190,5 +191,7 @@ export const getAllAppointmentsRaw = asyncHandler(async (req, res) => {
   const appointments = await Appointment.find({});
   return res
     .status(200)
-    .json(new apiResponse(200, "Appointments fetched successfully", appointments));
+    .json(
+      new apiResponse(200, "Appointments fetched successfully", appointments)
+    );
 });

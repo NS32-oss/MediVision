@@ -1,92 +1,101 @@
-"use client"
-import React from "react"
-import { useState, useEffect } from "react"
-import { Link } from "react-router-dom"
-import Navbar from "../components/Navbar"
-import Footer from "../components/Footer"
-import DashboardStats from "../components/DashboardStats"
-import { useAuth } from "../context/AuthContext"
+"use client";
+import React, { useState, useEffect } from "react";
+import { Link } from "react-router-dom";
+import Navbar from "../components/Navbar";
+import Footer from "../components/Footer";
+import DashboardStats from "../components/DashboardStats";
+import { useAuth } from "../context/AuthContext";
 
 const AdminDashboard = () => {
-  const { currentUser } = useAuth()
-  const [doctors, setDoctors] = useState([])
-  const [pendingApprovals, setPendingApprovals] = useState([])
-  const [isLoading, setIsLoading] = useState(true)
+  const { currentUser } = useAuth();
+  const [doctors, setDoctors] = useState([]);
+  const [pendingApprovals, setPendingApprovals] = useState([]);
+  const [isLoading, setIsLoading] = useState(true);
+
+  const API_BASE_URL = "http://localhost:8000"; // Backend URL
 
   useEffect(() => {
-    // Simulate API call to fetch admin data
     const fetchAdminData = async () => {
       try {
-        // In a real app, these would be actual API calls
-        // const doctorsResponse = await fetch('/api/admin/doctors');
-        // const approvalsResponse = await fetch('/api/admin/pending-approvals');
+        setIsLoading(true);
 
-        // Simulate API response
-        setTimeout(() => {
-          setDoctors([
-            {
-              id: "DOC-1001",
-              name: "Sarah Johnson",
-              specialty: "Cardiology",
-              experience: 12,
-              patients: 145,
-              status: "Active",
+        // Fetch all doctors
+        const doctorsResponse = await fetch(
+          `${API_BASE_URL}/api/v1/admin/doctors`,
+          {
+            method: "GET",
+            headers: {
+              "Content-Type": "application/json",
             },
-            {
-              id: "DOC-1002",
-              name: "Michael Chen",
-              specialty: "Pediatrics",
-              experience: 8,
-              patients: 98,
-              status: "Active",
-            },
-            {
-              id: "DOC-1003",
-              name: "Lisa Rodriguez",
-              specialty: "Neurology",
-              experience: 15,
-              patients: 120,
-              status: "Active",
-            },
-            {
-              id: "DOC-1004",
-              name: "James Wilson",
-              specialty: "Orthopedics",
-              experience: 10,
-              patients: 110,
-              status: "On Leave",
-            },
-          ])
+          }
+        );
 
-          setPendingApprovals([
-            {
-              id: "REQ-2001",
-              name: "Dr. Robert Taylor",
-              specialty: "Dermatology",
-              experience: 7,
-              email: "robert.taylor@example.com",
-              date: "2023-06-10",
-            },
-            {
-              id: "REQ-2002",
-              name: "Dr. Amanda Lee",
-              specialty: "Psychiatry",
-              experience: 9,
-              email: "amanda.lee@example.com",
-              date: "2023-06-12",
-            },
-          ])
+        if (doctorsResponse.ok) {
+          const doctorsData = await doctorsResponse.json();
+          setDoctors(doctorsData.data);
+        } else {
+          console.error("Failed to fetch doctors");
+        }
 
-          setIsLoading(false)
-        }, 1000)
+        // Fetch pending approvals
+        const approvalsResponse = await fetch(
+          `${API_BASE_URL}/api/v1/admin/pending-approvals`,
+          {
+            method: "GET",
+            headers: {
+              "Content-Type": "application/json",
+            },
+          }
+        );
+
+        if (approvalsResponse.ok) {
+          const approvalsData = await approvalsResponse.json();
+          setPendingApprovals(approvalsData.data);
+        } else {
+          console.error("Failed to fetch pending approvals");
+        }
       } catch (error) {
-        console.error("Error fetching admin data:", error)
-        setIsLoading(false)
+        console.error("Error fetching admin data:", error);
+      } finally {
+        setIsLoading(false);
       }
-    }
+    };
 
-    fetchAdminData()
-  }, [])
+    fetchAdminData();
+  }, []);
+
+  // Handle doctor approval/rejection
+  const handleApproval = async (doctorId, isApproved) => {
+    try {
+      const response = await fetch(
+        `${API_BASE_URL}/api/v1/admin/doctors/${doctorId}/approval`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ isApproved }),
+        }
+      );
+
+      if (response.ok) {
+        // Update the pending approvals list
+        setPendingApprovals((prev) =>
+          prev.filter((doctor) => doctor._id !== doctorId)
+        );
+
+        // If approved, update the doctors list
+        if (isApproved) {
+          const updatedDoctor = await response.json();
+          setDoctors((prev) => [...prev, updatedDoctor.data]);
+        }
+      } else {
+        console.error("Failed to update doctor approval status");
+      }
+    } catch (error) {
+      console.error("Error handling approval:", error);
+    }
+  };
 
   // Stats for the dashboard
   const stats = [
@@ -114,7 +123,7 @@ const AdminDashboard = () => {
     },
     {
       title: "Active Doctors",
-      value: "42",
+      value: doctors.length,
       change: 8,
       bgColor: "bg-green-100",
       icon: (
@@ -135,8 +144,8 @@ const AdminDashboard = () => {
       ),
     },
     {
-      title: "Appointments",
-      value: "328",
+      title: "Pending Approvals",
+      value: pendingApprovals.length,
       change: 15,
       bgColor: "bg-purple-100",
       icon: (
@@ -156,38 +165,8 @@ const AdminDashboard = () => {
         </svg>
       ),
     },
-    {
-      title: "Revenue",
-      value: "$52,489",
-      change: 7,
-      bgColor: "bg-yellow-100",
-      icon: (
-        <svg
-          className="w-5 h-5 text-yellow-600"
-          fill="none"
-          stroke="currentColor"
-          viewBox="0 0 24 24"
-          xmlns="http://www.w3.org/2000/svg"
-        >
-          <path
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            strokeWidth="2"
-            d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
-          ></path>
-        </svg>
-      ),
-    },
-  ]
-
-  // Handle doctor approval/rejection
-  const handleApproval = (id, approved) => {
-    // In a real app, this would be an API call
-    // await fetch(`/api/admin/approve-doctor/${id}`, { method: 'POST', body: JSON.stringify({ approved }) });
-
-    // Update local state
-    setPendingApprovals(pendingApprovals.filter((doctor) => doctor.id !== id))
-  }
+  ];
+  console.log("Doctors:", doctors);
 
   return (
     <div className="min-h-screen flex flex-col bg-[#F8FAFC]">
@@ -196,8 +175,12 @@ const AdminDashboard = () => {
       <main className="flex-grow py-8">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="mb-8">
-            <h1 className="text-2xl font-bold text-[#374151]">Admin Dashboard</h1>
-            <p className="text-gray-600">Manage doctors, patients, and system metrics</p>
+            <h1 className="text-2xl font-bold text-[#374151]">
+              Admin Dashboard
+            </h1>
+            <p className="text-gray-600">
+              Manage doctors, patients, and system metrics
+            </p>
           </div>
 
           {/* Dashboard Stats */}
@@ -205,7 +188,10 @@ const AdminDashboard = () => {
             {isLoading ? (
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
                 {[...Array(4)].map((_, index) => (
-                  <div key={index} className="bg-white p-4 rounded-md shadow-sm border border-gray-200 animate-pulse">
+                  <div
+                    key={index}
+                    className="bg-white p-4 rounded-md shadow-sm border border-gray-200 animate-pulse"
+                  >
                     <div className="h-4 bg-gray-200 rounded w-1/2 mb-4"></div>
                     <div className="h-6 bg-gray-200 rounded w-1/3 mb-2"></div>
                     <div className="h-4 bg-gray-200 rounded w-1/4"></div>
@@ -220,8 +206,13 @@ const AdminDashboard = () => {
           {/* Doctor Management */}
           <div className="mb-8">
             <div className="flex items-center justify-between mb-4">
-              <h2 className="text-xl font-semibold text-[#374151]">Doctor Management</h2>
-              <Link to="/doctors" className="text-sm text-[#0EA5E9] hover:text-[#0EA5E9]/80 font-medium">
+              <h2 className="text-xl font-semibold text-[#374151]">
+                Doctor Management
+              </h2>
+              <Link
+                to="/doctors"
+                className="text-sm text-[#0EA5E9] hover:text-[#0EA5E9]/80 font-medium"
+              >
                 View All Doctors
               </Link>
             </div>
@@ -287,46 +278,58 @@ const AdminDashboard = () => {
                     </tr>
                   </thead>
                   <tbody className="bg-white divide-y divide-gray-200">
-                    {doctors.map((doctor) => (
-                      <tr key={doctor.id}>
-                        <td className="px-6 py-4 whitespace-nowrap text-sm text-[#374151]">{doctor.id}</td>
-                        <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-[#374151]">
-                          Dr. {doctor.name}
-                        </td>
-                        <td className="px-6 py-4 whitespace-nowrap text-sm text-[#374151]">{doctor.specialty}</td>
-                        <td className="px-6 py-4 whitespace-nowrap text-sm text-[#374151]">
-                          {doctor.experience} years
-                        </td>
-                        <td className="px-6 py-4 whitespace-nowrap text-sm text-[#374151]">{doctor.patients}</td>
-                        <td className="px-6 py-4 whitespace-nowrap">
-                          <span
-                            className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${
-                              doctor.status === "Active"
-                                ? "bg-green-100 text-[#22C55E]"
-                                : "bg-yellow-100 text-yellow-800"
-                            }`}
-                          >
-                            {doctor.status}
-                          </span>
-                        </td>
-                        <td className="px-6 py-4 whitespace-nowrap text-sm">
-                          <div className="flex space-x-2">
-                            <Link
-                              to={`/doctor/${doctor.id}`}
-                              className="text-[#0EA5E9] hover:text-[#0EA5E9]/80 font-medium"
+                    {doctors
+                      .filter(
+                        (doctor) =>
+                          doctor.status === "Approved" ||
+                          doctor.status === "Active"
+                      ) // Exclude pending doctors
+                      .map((doctor) => (
+                        <tr key={doctor._id}>
+                          <td className="px-6 py-4 whitespace-nowrap text-sm text-[#374151]">
+                            {doctor._id}
+                          </td>
+                          <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-[#374151]">
+                            Dr. {doctor.name}
+                          </td>
+                          <td className="px-6 py-4 whitespace-nowrap text-sm text-[#374151]">
+                            {doctor.specialty}
+                          </td>
+                          <td className="px-6 py-4 whitespace-nowrap text-sm text-[#374151]">
+                            {doctor.experience} years
+                          </td>
+                          <td className="px-6 py-4 whitespace-nowrap text-sm text-[#374151]">
+                            {doctor.patients?.length || 0} patients
+                          </td>
+                          <td className="px-6 py-4 whitespace-nowrap">
+                            <span
+                              className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${
+                                doctor.status === "Active"
+                                  ? "bg-green-100 text-[#22C55E]"
+                                  : "bg-yellow-100 text-yellow-800"
+                              }`}
                             >
-                              View
-                            </Link>
-                            <Link
-                              to={`/doctor/${doctor.id}/edit`}
-                              className="text-gray-600 hover:text-gray-900 font-medium"
-                            >
-                              Edit
-                            </Link>
-                          </div>
-                        </td>
-                      </tr>
-                    ))}
+                              {doctor.status}
+                            </span>
+                          </td>
+                          <td className="px-6 py-4 whitespace-nowrap text-sm">
+                            <div className="flex space-x-2">
+                              <Link
+                                to={`/doctor/${doctor._id}`}
+                                className="text-[#0EA5E9] hover:text-[#0EA5E9]/80 font-medium"
+                              >
+                                View
+                              </Link>
+                              <Link
+                                to={`/doctor/${doctor._id}/edit`}
+                                className="text-gray-600 hover:text-gray-900 font-medium"
+                              >
+                                Edit
+                              </Link>
+                            </div>
+                          </td>
+                        </tr>
+                      ))}
                   </tbody>
                 </table>
               </div>
@@ -336,7 +339,9 @@ const AdminDashboard = () => {
           {/* Pending Approvals */}
           <div>
             <div className="flex items-center justify-between mb-4">
-              <h2 className="text-xl font-semibold text-[#374151]">Pending Doctor Approvals</h2>
+              <h2 className="text-xl font-semibold text-[#374151]">
+                Pending Doctor Approvals
+              </h2>
             </div>
 
             {isLoading ? (
@@ -399,28 +404,45 @@ const AdminDashboard = () => {
                     </tr>
                   </thead>
                   <tbody className="bg-white divide-y divide-gray-200">
-                    {pendingApprovals.map((doctor) => (
-                      <tr key={doctor.id}>
-                        <td className="px-6 py-4 whitespace-nowrap text-sm text-[#374151]">{doctor.id}</td>
+                    {pendingApprovals.map((doctor, index) => (
+                      <tr key={doctor._id}>
+                        <td className="px-6 py-4 whitespace-nowrap text-sm text-[#374151]">
+                          {doctor._id}
+                        </td>
                         <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-[#374151]">
                           {doctor.name}
                         </td>
-                        <td className="px-6 py-4 whitespace-nowrap text-sm text-[#374151]">{doctor.specialty}</td>
+                        <td className="px-6 py-4 whitespace-nowrap text-sm text-[#374151]">
+                          {doctor.specialty}
+                        </td>
                         <td className="px-6 py-4 whitespace-nowrap text-sm text-[#374151]">
                           {doctor.experience} years
                         </td>
-                        <td className="px-6 py-4 whitespace-nowrap text-sm text-[#374151]">{doctor.email}</td>
-                        <td className="px-6 py-4 whitespace-nowrap text-sm text-[#374151]">{doctor.date}</td>
+                        <td className="px-6 py-4 whitespace-nowrap text-sm text-[#374151]">
+                          {doctor.email}
+                        </td>
+                        <td className="px-6 py-4 whitespace-nowrap text-sm text-[#374151]">
+                          {
+                            [
+                              "2025-04-15",
+                              "2025-04-20",
+                              "2025-04-25",
+                              "2025-05-01",
+                              "2025-05-05",
+                            ][index % 5]
+                          }{" "}
+                          {/* Assign random dates */}
+                        </td>
                         <td className="px-6 py-4 whitespace-nowrap text-sm">
                           <div className="flex space-x-2">
                             <button
-                              onClick={() => handleApproval(doctor.id, true)}
+                              onClick={() => handleApproval(doctor._id, true)}
                               className="text-[#22C55E] hover:text-[#22C55E]/80 font-medium"
                             >
                               Approve
                             </button>
                             <button
-                              onClick={() => handleApproval(doctor.id, false)}
+                              onClick={() => handleApproval(doctor._id, false)}
                               className="text-red-600 hover:text-red-700 font-medium"
                             >
                               Reject
@@ -434,7 +456,9 @@ const AdminDashboard = () => {
               </div>
             ) : (
               <div className="bg-white p-6 rounded-md shadow-sm border border-gray-200 text-center">
-                <p className="text-gray-500">No pending doctor approvals at this time.</p>
+                <p className="text-gray-500">
+                  No pending doctor approvals at this time.
+                </p>
               </div>
             )}
           </div>
@@ -443,7 +467,7 @@ const AdminDashboard = () => {
 
       <Footer />
     </div>
-  )
-}
+  );
+};
 
-export default AdminDashboard
+export default AdminDashboard;

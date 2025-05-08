@@ -7,6 +7,7 @@ const doctorSchema = new mongoose.Schema({
   experience: { type: Number, required: true },
   appointments: [{ type: mongoose.Schema.Types.ObjectId, ref: "Appointment" }],
   patients: [{ type: mongoose.Schema.Types.ObjectId, ref: "Patient" }],
+  status: { type: String, enum: ["Pending", "Approved", "Rejected"], default: "Pending" }, // New field
 });
 
 export const Doctor = mongoose.model("Doctor", doctorSchema);

@@ -27,8 +27,9 @@ app.use(express.static("public"));
 import authRouter from "./routes/auth.router.js";
 import doctorRouter from "./routes/doctor.router.js";
 import patientRouter from "./routes/patient.router.js";
+import adminRouter from "./routes/admin.router.js";
 
-// Register routes
+app.use("/api/v1/admin", adminRouter);
 app.use("/api/v1/patients", patientRouter);
 app.use("/api/v1/doctors", doctorRouter);
 app.use("/api/v1/auth", authRouter);
