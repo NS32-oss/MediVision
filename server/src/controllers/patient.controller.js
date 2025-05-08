@@ -9,6 +9,7 @@ export const bookAppointment = asyncHandler(async (req, res) => {
   console.log("Booking appointment for user:", req.body);
   const { patientId } = req.params; // This is actually the userId
   const { doctorId, appointmentType, dateTime } = req.body;
+  console.log("dateTime: ", dateTime);
 
   // Validate input
   if (!doctorId || !appointmentType || !dateTime) {
@@ -45,10 +46,10 @@ export const bookAppointment = asyncHandler(async (req, res) => {
     return res.status(404).json(new apiResponse(404, "Doctor not found"));
   }
 
-  // Convert the dateTime string into a valid Date object
-  const today = new Date(); // Use today's date
-  const [startTime] = dateTime.split(" - "); // Extract the start time
-  const appointmentDateTime = new Date(`${today.toDateString()} ${startTime}`);
+  // Parse the dateTime string into a valid Date object
+  const [datePart, timePart] = dateTime.split(" "); // Split into date and time parts
+  const [startTime] = timePart.split(" - "); // Extract the start time
+  const appointmentDateTime = new Date(`${datePart} ${startTime}`);
 
   if (isNaN(appointmentDateTime)) {
     return res
@@ -61,7 +62,7 @@ export const bookAppointment = asyncHandler(async (req, res) => {
     doctor: doctor.name,
     patient: user.name, // Use the userId as the patientId
     appointmentType,
-    dateTime: appointmentDateTime, // Use the converted Date object
+    dateTime: appointmentDateTime, // Use the parsed Date object
     status: "Pending", // Default status
   });
 

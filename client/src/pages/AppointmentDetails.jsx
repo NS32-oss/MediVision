@@ -9,6 +9,7 @@ const AppointmentDetails = () => {
   const [doctors, setDoctors] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
   const [selectedTimeSlots, setSelectedTimeSlots] = useState({}); // Object to store time slots for each doctor
+  const [selectedDates, setSelectedDates] = useState({}); // Object to store selected dates for each doctor
 
   // Predefined time slots
   const timeSlots = [
@@ -48,8 +49,21 @@ const AppointmentDetails = () => {
     }));
   };
 
+  const handleDateChange = (doctorId, date) => {
+    setSelectedDates((prev) => ({
+      ...prev,
+      [doctorId]: date, // Update the date for the specific doctor
+    }));
+  };
+
   const handleBookAppointment = async (doctorId) => {
     const selectedTimeSlot = selectedTimeSlots[doctorId]; // Get the selected time slot for this doctor
+    const selectedDate = selectedDates[doctorId]; // Get the selected date for this doctor
+
+    if (!selectedDate) {
+      alert("Please select a date.");
+      return;
+    }
 
     if (!selectedTimeSlot) {
       alert("Please select a time slot.");
@@ -67,7 +81,7 @@ const AppointmentDetails = () => {
           body: JSON.stringify({
             doctorId,
             appointmentType: "General Checkup", // Example type
-            dateTime: selectedTimeSlot, // Selected time slot
+            dateTime: `${selectedDate} ${selectedTimeSlot}`, // Combine date and time slot
           }),
         }
       );
@@ -77,6 +91,10 @@ const AppointmentDetails = () => {
         setSelectedTimeSlots((prev) => ({
           ...prev,
           [doctorId]: "", // Reset the time slot for this doctor
+        }));
+        setSelectedDates((prev) => ({
+          ...prev,
+          [doctorId]: "", // Reset the date for this doctor
         }));
       } else {
         alert("Failed to send appointment request.");
@@ -116,6 +134,9 @@ const AppointmentDetails = () => {
                       Experience
                     </th>
                     <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                      Date
+                    </th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                       Time Slot
                     </th>
                     <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
@@ -137,6 +158,16 @@ const AppointmentDetails = () => {
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap text-sm text-[#374151]">
                         {doctor.experience} years
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm">
+                        <input
+                          type="date"
+                          value={selectedDates[doctor._id] || ""}
+                          onChange={(e) =>
+                            handleDateChange(doctor._id, e.target.value)
+                          }
+                          className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#0EA5E9] focus:border-transparent"
+                        />
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap text-sm">
                         <select
